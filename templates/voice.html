@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Voice Localization{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <h2>🎤 Voice Localization</h2>
+
+    <form id="voiceForm" action="/process_voice" method="POST" enctype="multipart/form-data">
+
+        <label>Upload Audio File (Optional):</label>
+        <input type="file" name="audio_file" accept="audio/*">
+
+        <hr>
+
+        <h3>Or Record Live Audio:</h3>
+
+        <div class="record-controls">
+            <button type="button" id="startBtn">🎙 Start Recording</button>
+            <button type="button" id="stopBtn" disabled>⏹ Stop Recording</button>
+        </div>
+
+        <audio id="audioPreview" controls style="display:none;"></audio>
+
+        <input type="hidden" name="recorded_audio" id="recordedAudioData">
+
+        <hr>
+
+        <label>Target Language:</label>
+        <select name="target_language" required>
+            <option value="">-- Select Language --</option>
+            <option value="Hindi">Hindi</option>
+            <option value="French">French</option>
+            <option value="Spanish">Spanish</option>
+            <option value="German">German</option>
+            <option value="Japanese">Japanese</option>
+        </select>
+
+        <label>Target Region / Culture:</label>
+        <input type="text" name="target_region" placeholder="e.g., India, France" required>
+
+        <label>Tone:</label>
+        <select name="tone" required>
+            <option value="">-- Select Tone --</option>
+            <option value="Formal">Formal</option>
+            <option value="Casual">Casual</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Narrative">Narrative</option>
+            <option value="Professional">Professional</option>
+        </select>
+
+        <button type="submit">Process Voice Localization</button>
+
+    </form>
+
+</div>
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+
+const startBtn = document.getElementById("startBtn");
+const stopBtn = document.getElementById("stopBtn");
+const audioPreview = document.getElementById("audioPreview");
+const recordedAudioInput = document.getElementById("recordedAudioData");
+
+startBtn.onclick = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.start();
+
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = event => {
+        audioChunks.push(event.data);
+    };
+
+    mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+        const audioURL = URL.createObjectURL(audioBlob);
+
+        audioPreview.src = audioURL;
+        audioPreview.style.display = "block";
+
+        // Convert blob to base64 to send via form
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = function () {
+            recordedAudioInput.value = reader.result;
+        };
+    };
+
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+};
+
+stopBtn.onclick = () => {
+    mediaRecorder.stop();
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+};
+</script>
+
+{% endblock %}

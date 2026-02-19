@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Visual Localization{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <h2>🖼 Visual Localization</h2>
+
+    <form action="/process_visual" method="POST" enctype="multipart/form-data">
+
+        <label>Upload Image:</label>
+        <input type="file" name="image_file" accept="image/*" required>
+
+        <label>Optional Caption / UI Text:</label>
+        <textarea name="caption_text" rows="4" 
+        placeholder="Enter text from image (if any)..."></textarea>
+
+        <hr>
+
+        <label>Target Language:</label>
+        <select name="target_language" required>
+            <option value="">-- Select Language --</option>
+            <option value="Hindi">Hindi</option>
+            <option value="French">French</option>
+            <option value="Spanish">Spanish</option>
+            <option value="German">German</option>
+            <option value="Japanese">Japanese</option>
+        </select>
+
+        <label>Target Region / Culture:</label>
+        <input type="text" name="target_region" 
+        placeholder="e.g., India, France" required>
+
+        <label>Tone:</label>
+        <select name="tone" required>
+            <option value="">-- Select Tone --</option>
+            <option value="Formal">Formal</option>
+            <option value="Casual">Casual</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Narrative">Narrative</option>
+            <option value="Professional">Professional</option>
+        </select>
+
+        <button type="submit">Process Visual Localization</button>
+
+    </form>
+    <script>
+const imageInput = document.querySelector("input[name='image_file']");
+const preview = document.createElement("img");
+
+preview.style.maxWidth = "100%";
+preview.style.marginTop = "10px";
+
+imageInput.addEventListener("change", function() {
+    const file = this.files[0];
+    if (file) {
+        preview.src = URL.createObjectURL(file);
+        this.parentNode.appendChild(preview);
+    }
+});
+</script>
+
+
+    <div class="note">
+        <p>⚠ Supported formats: .jpg, .png, .jpeg</p>
+    </div>
+
+</div>
+
+{% endblock %}

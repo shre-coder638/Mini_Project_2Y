@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Text Localization Result{% endblock %}
+
+{% block content %}
+
+<div class="result-container">
+
+    <div class="metadata">
+        <h3>Localization Details</h3>
+        <p><strong>Language:</strong> {{ target_language }}</p>
+        <p><strong>Region:</strong> {{ target_region }}</p>
+        <p><strong>Tone:</strong> {{ tone }}</p>
+    </div>
+
+    <div class="split-view">
+
+        <div class="box">
+            <h3>Original Content</h3>
+            <p>{{ original_text }}</p>
+        </div>
+
+        <div class="box output">
+            <h3>Localized Output</h3>
+            <p>{{ localized_output }}</p>
+        </div>
+
+    </div>
+
+    <div class="actions">
+        <a href="/text"><button>🔄 Try Again</button></a>
+        <button>👍 Good</button>
+        <button>👎 Needs Improvement</button>
+    </div>
+
+</div>
+
+{% endblock %}

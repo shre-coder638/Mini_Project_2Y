@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Voice Localization Result{% endblock %}
+
+{% block content %}
+
+<div class="result-container">
+
+    <div class="metadata">
+        <h3>Localization Details</h3>
+        <p><strong>Language:</strong> {{ target_language }}</p>
+        <p><strong>Region:</strong> {{ target_region }}</p>
+        <p><strong>Tone:</strong> {{ tone }}</p>
+    </div>
+
+    <div class="box">
+        <h3>Transcribed Text</h3>
+        <p>{{ transcribed_text }}</p>
+    </div>
+
+    <div class="box output">
+        <h3>Localized Voice Output</h3>
+        <audio controls>
+            <source src="{{ audio_url }}" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <div class="actions">
+        <a href="/voice"><button>🔄 Try Again</button></a>
+    </div>
+
+</div>
+
+{% endblock %}

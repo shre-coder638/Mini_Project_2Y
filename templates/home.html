@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Localization AI{% endblock %}
+
+{% block content %}
+
+<div class="hero-section">
+    <div class="hero-content">
+        <h2 class="hero-title">Welcome to AI-Powered Localization</h2>
+        <p class="hero-subtitle">Transform your content for global audiences with context-aware AI</p>
+    </div>
+    
+    <div class="navigation-cards">
+        <a href="/text" class="nav-card text-card">
+            <div class="card-icon">📝</div>
+            <h3>Text Localization</h3>
+            <p>Translate and adapt written content with cultural context and appropriate tone</p>
+            <span class="card-arrow">→</span>
+        </a>
+        
+        <a href="/voice" class="nav-card voice-card">
+            <div class="card-icon">🎤</div>
+            <h3>Voice Localization</h3>
+            <p>Convert audio to text and localize with natural, region-specific language</p>
+            <span class="card-arrow">→</span>
+        </a>
+        
+        <a href="/visual" class="nav-card visual-card">
+            <div class="card-icon">🖼️</div>
+            <h3>Visual Localization</h3>
+            <p>Analyze images and generate culturally appropriate captions and descriptions</p>
+            <span class="card-arrow">→</span>
+        </a>
+    </div>
+    
+    <div class="features">
+        <div class="feature-item">
+            <span class="feature-icon">🧠</span>
+            <span>AI-Powered</span>
+        </div>
+        <div class="feature-item">
+            <span class="feature-icon">🌐</span>
+            <span>Multi-Language</span>
+        </div>
+        <div class="feature-item">
+            <span class="feature-icon">🎯</span>
+            <span>Context-Aware</span>
+        </div>
+        <div class="feature-item">
+            <span class="feature-icon">⚡</span>
+            <span>Fast Results</span>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

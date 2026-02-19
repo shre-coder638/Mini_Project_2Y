@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Localization AI{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">🌍</span>
+            <span class="brand-text">Localization AI</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
+            <li><a href="/text" class="{% if request.endpoint == 'text_localization' %}active{% endif %}">Text</a></li>
+            <li><a href="/voice" class="{% if request.endpoint == 'voice_localization' %}active{% endif %}">Voice</a></li>
+            <li><a href="/visual" class="{% if request.endpoint == 'visual_localization' %}active{% endif %}">Visual</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <h1>🌍 Automated Content Localization Platform</h1>
+        <p>Context-Aware Generative AI Based Localization</p>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2026 Localization AI | Built with Flask</p>
+    </footer>
+    <!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loader"></div>
+    <p>🧠 AI is generating localized content...</p>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const forms = document.querySelectorAll("form");
+
+    forms.forEach(form => {
+        form.addEventListener("submit", function() {
+            document.getElementById("loadingOverlay").style.display = "flex";
+        });
+    });
+});
+</script>
+
+
+</body>
+</html>

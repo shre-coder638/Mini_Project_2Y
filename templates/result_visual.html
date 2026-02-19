@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Visual Localization Result{% endblock %}
+
+{% block content %}
+
+<div class="result-container">
+
+    <div class="metadata">
+        <h3>Localization Details</h3>
+        <p><strong>Language:</strong> {{ target_language }}</p>
+        <p><strong>Region:</strong> {{ target_region }}</p>
+        <p><strong>Tone:</strong> {{ tone }}</p>
+    </div>
+
+    <div class="box">
+        <h3>Extracted Text / Caption</h3>
+        <p>{{ extracted_text }}</p>
+    </div>
+
+    <div class="box output">
+        <h3>Localized Visual Text</h3>
+        <p>{{ localized_output }}</p>
+    </div>
+
+    <div class="actions">
+        <a href="/visual"><button>🔄 Try Again</button></a>
+    </div>
+
+</div>
+
+{% endblock %}
