@@ -1,4 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
+from services.voice_service import speech_to_text, text_to_speech
+from services.gemini_service import localize_text
+
+
 
 app = Flask(__name__)
 
@@ -34,8 +38,15 @@ def generate():
     target_region = request.form.get("target_region")
     tone = request.form.get("tone")
 
-    # Temporary dummy output (replace later with Gemini)
-    localized_output = f"[Localized {tone} version in {target_language} for {target_region}]"
+    try:
+        localized_output = localize_text(
+            original_text,
+            target_language,
+            target_region,
+            tone
+        )
+    except Exception as e:
+        localized_output = f"Error: {str(e)}"
 
     return render_template(
         "result_text.html",
@@ -45,6 +56,7 @@ def generate():
         target_region=target_region,
         tone=tone
     )
+
 
 
 @app.route("/voice")
@@ -59,18 +71,36 @@ def process_voice():
     target_region = request.form.get("target_region")
     tone = request.form.get("tone")
 
-    if audio_file:
-        filename = audio_file.filename
-    else:
-        filename = "No file uploaded"
+    if not audio_file:
+        return "No audio uploaded"
 
-    return f"""
-    <h2>Voice Input Received:</h2>
-    <p><strong>File:</strong> {filename}</p>
-    <p><strong>Language:</strong> {target_language}</p>
-    <p><strong>Region:</strong> {target_region}</p>
-    <p><strong>Tone:</strong> {tone}</p>
-    """
+    audio_path = "temp_audio.wav"
+    audio_file.save(audio_path)
+
+    # Step 1: Speech → Text
+    transcribed_text = speech_to_text(audio_path)
+
+    # Step 2: Localize
+    localized_text = localize_text(
+        transcribed_text,
+        target_language,
+        target_region,
+        tone
+    )
+
+    # Step 3: Text → Speech (ElevenLabs)
+    output_audio_path = text_to_speech(localized_text)
+
+    return render_template(
+        "result_voice.html",
+        transcribed_text=transcribed_text,
+        localized_output=localized_text,
+        audio_url="/" + output_audio_path,
+        target_language=target_language,
+        target_region=target_region,
+        tone=tone
+    )
+
 
 @app.route("/visual")
 def visual_localization():
