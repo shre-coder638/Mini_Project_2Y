@@ -28,6 +28,16 @@
     <div class="actions">
         <a href="/voice"><button>🔄 Try Again</button></a>
     </div>
+    <div class="box output">
+    <h3>Localized Text</h3>
+    <p>{{ localized_output }}</p>
+
+    <h3 style="margin-top:15px;">Localized Voice Output</h3>
+    <audio controls>
+        <source src="{{ audio_url }}" type="audio/mpeg">
+    </audio>
+</div>
+
 
 </div>
 
