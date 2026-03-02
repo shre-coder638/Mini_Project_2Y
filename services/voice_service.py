@@ -1,37 +1,45 @@
-import os
+from gtts import gTTS
 import speech_recognition as sr
-from elevenlabs.client import ElevenLabs
-from dotenv import load_dotenv
+import os
 
-load_dotenv()
+LANGUAGE_MAP = {
+    "Hindi": "hi",
+    "Spanish": "es",
+    "French": "fr",
+    "German": "de",
+    "Japanese": "ja",
+    "English": "en"
+}
 
-eleven_client = ElevenLabs(
-    api_key=os.getenv("ELEVENLABS_API_KEY")
-)
+def text_to_speech(text, target_language, output_path="static/output_voice.mp3"):
+    try:
+        lang_code = LANGUAGE_MAP.get(target_language, "en")
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+        tts = gTTS(
+            text=text,
+            lang=lang_code,
+            slow=False
+        )
+
+        tts.save(output_path)
+        return output_path
+
+    except Exception as e:
+        print("gTTS Error:", e)
+        return None
+
 
 def speech_to_text(audio_path):
-    recognizer = sr.Recognizer()
-
-    with sr.AudioFile(audio_path) as source:
-        audio = recognizer.record(source)
-
     try:
-        text = recognizer.recognize_google(audio)
-        return text
-    except Exception:
-        return "Could not transcribe audio."
+        recognizer = sr.Recognizer()
+        with sr.AudioFile(audio_path) as source:
+            audio_data = recognizer.record(source)
 
+        return recognizer.recognize_google(audio_data)
 
-def text_to_speech(text, output_path="static/output_voice.mp3"):
-
-    audio = eleven_client.text_to_speech.convert(
-        voice_id="21m00Tcm4TlvDq8ikWAM",  # Default Rachel voice
-        model_id="eleven_multilingual_v2",
-        text=text
-    )
-
-    with open(output_path, "wb") as f:
-        for chunk in audio:
-            f.write(chunk)
-
-    return output_path
+    except sr.UnknownValueError:
+        return ""
+    except Exception as e:
+        print("Speech Recognition Error:", e)
+        return ""

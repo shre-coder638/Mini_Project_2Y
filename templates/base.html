@@ -6,16 +6,35 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    {% set current_section = '' %}
+    {% if request.endpoint == 'home' %}
+        {% set current_section = 'home' %}
+    {% elif request.endpoint in ['text_localization', 'generate'] %}
+        {% set current_section = 'text' %}
+    {% elif request.endpoint in ['voice_localization', 'process_voice'] %}
+        {% set current_section = 'voice' %}
+    {% elif request.endpoint in ['visual_localization', 'process_visual'] %}
+        {% set current_section = 'visual' %}
+    {% endif %}
+
     <nav class="navbar">
         <div class="nav-brand">
             <span class="logo">🌍</span>
             <span class="brand-text">Localization AI</span>
         </div>
         <ul class="nav-links">
-            <li><a href="/" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
-            <li><a href="/text" class="{% if request.endpoint == 'text_localization' %}active{% endif %}">Text</a></li>
-            <li><a href="/voice" class="{% if request.endpoint == 'voice_localization' %}active{% endif %}">Voice</a></li>
-            <li><a href="/visual" class="{% if request.endpoint == 'visual_localization' %}active{% endif %}">Visual</a></li>
+            {% if current_section != 'home' %}
+                <li><a href="/">Home</a></li>
+            {% endif %}
+            {% if current_section != 'text' %}
+                <li><a href="/text">Text</a></li>
+            {% endif %}
+            {% if current_section != 'voice' %}
+                <li><a href="/voice">Voice</a></li>
+            {% endif %}
+            {% if current_section != 'visual' %}
+                <li><a href="/visual">Visual</a></li>
+            {% endif %}
         </ul>
     </nav>
 

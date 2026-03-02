@@ -16,20 +16,22 @@ def localize_text(original_text, target_language, target_region, tone):
     """
 
     prompt = f"""
-    You are an expert multilingual localization engine.
-
-    Task:
-    1. Understand the intent and tone of the content.
-    2. Translate it into {target_language}.
-    3. Adapt it culturally for {target_region}.
-    4. Maintain a {tone} tone.
-    5. Replace idioms, metaphors, and cultural references appropriately.
-    6. Preserve meaning, not word-by-word translation.
-
-    Content:
-    "{original_text}"
-
-    Provide only the localized output.
+     You are a localization engine.
+     
+     Translate the content into {target_language}
+     for {target_region}.
+     
+     IMPORTANT:
+     - Preserve the emotional tone of the original speaker.
+     - Do not exaggerate or rephrase unnecessarily.
+     - Maintain similar sentence length and intensity.
+     - Keep speech natural for spoken delivery.
+     - Maintain {tone} tone without changing speaker personality.
+     
+     Content:
+     "{original_text}"
+     
+     Return only the localized text.
     """
 
     response = model.generate_content(prompt)

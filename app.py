@@ -3,12 +3,13 @@ from services.voice_service import speech_to_text, text_to_speech
 from services.gemini_service import localize_text
 
 
-
 app = Flask(__name__)
+
 
 @app.route("/")
 def home():
     return render_template("home.html")
+
 
 @app.route("/process", methods=["POST"])
 def process():
@@ -16,20 +17,20 @@ def process():
 
     if content_type == "text":
         return redirect(url_for("text_localization"))
-    
+
     elif content_type == "audio":
         return redirect(url_for("voice_localization"))
-    
+
     elif content_type == "visual":
         return redirect(url_for("visual_localization"))
 
     return "Module coming soon!"
 
 
-
 @app.route("/text")
 def text_localization():
     return render_template("text.html")
+
 
 @app.route("/generate", methods=["POST"])
 def generate():
@@ -40,10 +41,7 @@ def generate():
 
     try:
         localized_output = localize_text(
-            original_text,
-            target_language,
-            target_region,
-            tone
+            original_text, target_language, target_region, tone
         )
     except Exception as e:
         localized_output = f"Error: {str(e)}"
@@ -54,9 +52,8 @@ def generate():
         localized_output=localized_output,
         target_language=target_language,
         target_region=target_region,
-        tone=tone
+        tone=tone,
     )
-
 
 
 @app.route("/voice")
@@ -77,28 +74,27 @@ def process_voice():
     audio_path = "temp_audio.wav"
     audio_file.save(audio_path)
 
-    # Step 1: Speech → Text
+    # Speech to Text
     transcribed_text = speech_to_text(audio_path)
 
-    # Step 2: Localize
+    # Localization
     localized_text = localize_text(
-        transcribed_text,
-        target_language,
-        target_region,
-        tone
+        transcribed_text, target_language, target_region, tone
     )
 
-    # Step 3: Text → Speech (ElevenLabs)
-    output_audio_path = text_to_speech(localized_text)
+    # Text to Speech (gTTS only now)
+    output_audio_path = text_to_speech(localized_text, target_language)
+
+    audio_url = "/" + output_audio_path if output_audio_path else None
 
     return render_template(
         "result_voice.html",
         transcribed_text=transcribed_text,
         localized_output=localized_text,
-        audio_url="/" + output_audio_path,
+        audio_url=audio_url,
         target_language=target_language,
         target_region=target_region,
-        tone=tone
+        tone=tone,
     )
 
 
@@ -125,7 +121,6 @@ def process_visual():
     <p><strong>Region:</strong> {target_region}</p>
     <p><strong>Tone:</strong> {tone}</p>
     """
-
 
 
 if __name__ == "__main__":

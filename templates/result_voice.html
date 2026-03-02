@@ -19,10 +19,14 @@
     </div>
 
     <div class="box output">
-        <h3>Localized Voice Output</h3>
+        {% if audio_url %}
+        <h3 style="margin-top:15px;">Localized Voice Output</h3>
         <audio controls>
             <source src="{{ audio_url }}" type="audio/mpeg">
         </audio>
+        {% else %}
+            <p style="color:red;">⚠ Voice generation failed. Check ElevenLabs permissions.</p>
+        {% endif %}
     </div>
 
     <div class="actions">

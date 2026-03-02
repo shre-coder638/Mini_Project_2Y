@@ -1,5 +1,15 @@
+# Virtual environment
 venv/
 __pycache__/
 *.pyc
-*.md
-*.bat
+
+# Environment variables
+.env
+
+# Audio outputs
+static/output_voice.mp3
+temp_audio.wav
+
+# OS files
+.DS_Store
+Thumbs.db
