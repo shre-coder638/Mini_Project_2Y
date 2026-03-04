@@ -76,21 +76,21 @@ Return:
 TECH STACK
 -----------------------------------
 
-Backend: Python (Flask)
-AI Integration: OpenAI API or HuggingFace
-OCR: pytesseract or easyocr
-Image Processing: PIL
-Deployment-ready structure
+- Backend: Python (Flask)
+- AI Integration: OpenAI API or HuggingFace
+- OCR: pytesseract or easyocr
+- Image Processing: PIL
+- Deployment-ready structure
 
 -----------------------------------
 FINAL EXPECTED BEHAVIOR
 -----------------------------------
 
-User uploads image → 
-System generates description → 
-Extracts text → 
-Combines context → 
-AI culturally adapts content → 
-Returns localized result in structured JSON
+- User uploads image → 
+- System generates description → 
+- Extracts text → 
+- Combines context → 
+- AI culturally adapts content → 
+- Returns localized result in structured JSON
 
-The module must be scalable and API-ready.
+- The module must be scalable and API-ready.
