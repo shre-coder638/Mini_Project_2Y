@@ -19,29 +19,24 @@
     </div>
 
     <div class="box output">
+        <h3>Localized Text</h3>
+        <p>{{ localized_output }}</p>
+    </div>
+
+    <div class="box output">
         {% if audio_url %}
         <h3 style="margin-top:15px;">Localized Voice Output</h3>
         <audio controls>
-            <source src="{{ audio_url }}" type="audio/mpeg">
+            <source src="{{ audio_url }}" type="audio/wav">
         </audio>
         {% else %}
-            <p style="color:red;">⚠ Voice generation failed. Check ElevenLabs permissions.</p>
+            <p style="color:red;">⚠ Voice generation failed. Check permissions.</p>
         {% endif %}
     </div>
 
     <div class="actions">
         <a href="/voice"><button>🔄 Try Again</button></a>
     </div>
-    <div class="box output">
-    <h3>Localized Text</h3>
-    <p>{{ localized_output }}</p>
-
-    <h3 style="margin-top:15px;">Localized Voice Output</h3>
-    <audio controls>
-        <source src="{{ audio_url }}" type="audio/mpeg">
-    </audio>
-</div>
-
 
 </div>
 

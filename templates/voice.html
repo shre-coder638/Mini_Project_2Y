@@ -7,7 +7,7 @@
 <div class="card">
     <h2>🎤 Voice Localization</h2>
 
-    <form id="voiceForm" action="/process_voice" method="POST" enctype="multipart/form-data">
+    <form id="voiceForm" enctype="multipart/form-data">
 
         <label>Upload Audio File (Optional):</label>
         <input type="file" name="audio_file" accept="audio/*">
@@ -23,12 +23,10 @@
 
         <audio id="audioPreview" controls style="display:none;"></audio>
 
-        <input type="hidden" name="recorded_audio" id="recordedAudioData">
-
         <hr>
 
         <label>Target Language:</label>
-        <select name="target_language" required>
+        <select id="target_language" name="target_language" required>
             <option value="">-- Select Language --</option>
             <option value="Hindi">Hindi</option>
             <option value="French">French</option>
@@ -38,10 +36,10 @@
         </select>
 
         <label>Target Region / Culture:</label>
-        <input type="text" name="target_region" placeholder="e.g., India, France" required>
+        <input id="target_region" type="text" name="target_region" placeholder="e.g., India, France" required>
 
         <label>Tone:</label>
-        <select name="tone" required>
+        <select id="tone" name="tone" required>
             <option value="">-- Select Tone --</option>
             <option value="Formal">Formal</option>
             <option value="Casual">Casual</option>
@@ -57,50 +55,153 @@
 </div>
 
 <script>
-let mediaRecorder;
-let audioChunks = [];
+document.addEventListener('DOMContentLoaded', () => {
+  let mediaRecorder = null;
+  let mediaStream = null;
+  let audioChunks = [];
+  let audioBlob = null;
+  let audioUrl = null;
 
-const startBtn = document.getElementById("startBtn");
-const stopBtn = document.getElementById("stopBtn");
-const audioPreview = document.getElementById("audioPreview");
-const recordedAudioInput = document.getElementById("recordedAudioData");
+  const startBtn = document.getElementById("startBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const audioPreview = document.getElementById("audioPreview");
+  const voiceForm = document.getElementById("voiceForm");
 
-startBtn.onclick = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  function chooseMimeType() {
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported) {
+      if (MediaRecorder.isTypeSupported('audio/webm')) return 'audio/webm';
+      if (MediaRecorder.isTypeSupported('audio/ogg')) return 'audio/ogg';
+      if (MediaRecorder.isTypeSupported('audio/wav')) return 'audio/wav';
+    }
+    return '';
+  }
 
-    mediaRecorder = new MediaRecorder(stream);
-    mediaRecorder.start();
+  function cleanupPreview() {
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+      audioUrl = null;
+    }
+    audioPreview.src = '';
+    audioPreview.style.display = 'none';
+  }
 
+  startBtn.addEventListener('click', async () => {
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
     audioChunks = [];
+    audioBlob = null;
+    cleanupPreview();
 
-    mediaRecorder.ondataavailable = event => {
-        audioChunks.push(event.data);
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      console.error('getUserMedia failed:', err);
+      alert('Microphone access is required to record audio.');
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      return;
+    }
+
+    const mimeType = chooseMimeType();
+    try {
+      mediaRecorder = mimeType ? new MediaRecorder(mediaStream, { type: mimeType }) : new MediaRecorder(mediaStream);
+    } catch (err) {
+      // Fallback to default MediaRecorder if specific mimeType fails
+      console.warn('Failed to create MediaRecorder with chosen mimeType, falling back:', err);
+      mediaRecorder = new MediaRecorder(mediaStream);
+    }
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) audioChunks.push(e.data);
     };
 
     mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-        const audioURL = URL.createObjectURL(audioBlob);
+      audioBlob = new Blob(audioChunks, { type: mimeType || audioChunks[0]?.type || 'application/octet-stream' });
+      audioUrl = URL.createObjectURL(audioBlob);
+      audioPreview.src = audioUrl;
+      audioPreview.style.display = 'block';
+      audioChunks = [];
 
-        audioPreview.src = audioURL;
-        audioPreview.style.display = "block";
-
-        // Convert blob to base64 to send via form
-        const reader = new FileReader();
-        reader.readAsDataURL(audioBlob);
-        reader.onloadend = function () {
-            recordedAudioInput.value = reader.result;
-        };
+      // stop all tracks to release microphone
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(t => t.stop());
+        mediaStream = null;
+      }
     };
 
-    startBtn.disabled = true;
-    stopBtn.disabled = false;
-};
+    mediaRecorder.start();
+  });
 
-stopBtn.onclick = () => {
-    mediaRecorder.stop();
+  stopBtn.addEventListener('click', () => {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
     startBtn.disabled = false;
     stopBtn.disabled = true;
-};
+  });
+
+  // Disable controls if MediaRecorder not available
+  if (!navigator.mediaDevices || !window.MediaRecorder) {
+    startBtn.disabled = true;
+    stopBtn.disabled = true;
+    console.warn('Browser does not support MediaRecorder or getUserMedia');
+  }
+
+  // Handle form submission
+  voiceForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fileInput = document.querySelector("input[name='audio_file']");
+    const hasRecordedAudio = audioBlob !== null;
+    const hasUploadedFile = fileInput.files && fileInput.files.length > 0;
+
+    if (!hasRecordedAudio && !hasUploadedFile) {
+      alert('Please upload or record audio first!');
+      return;
+    }
+
+    const formData = new FormData();
+
+    if (hasRecordedAudio) {
+      // choose extension based on blob type
+      const type = audioBlob.type || '';
+      let ext = 'webm';
+      if (type.includes('ogg')) ext = 'ogg';
+      if (type.includes('wav')) ext = 'wav';
+      formData.append('audio_file', audioBlob, `recorded.${ext}`);
+    } else {
+      formData.append('audio_file', fileInput.files[0]);
+    }
+
+    formData.append('target_language', document.getElementById('target_language').value);
+    formData.append('target_region', document.getElementById('target_region').value);
+    formData.append('tone', document.getElementById('tone').value);
+
+    // optional: disable form while uploading
+    const submitBtn = voiceForm.querySelector("button[type='submit']");
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+      const response = await fetch('/process_voice', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        alert('Error: ' + errorText);
+        return;
+      }
+
+      window.location.href = '/voice_results';
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      alert('Error processing voice. Check browser console for details.');
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+});
 </script>
 
 {% endblock %}
