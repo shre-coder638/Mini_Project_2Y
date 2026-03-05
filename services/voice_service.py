@@ -16,6 +16,19 @@ LANGUAGE_MAP = {
     "English": "en"
 }
 
+# Added broader language support
+LANGUAGE_MAP.update({
+    "Chinese (Simplified)": "zh",
+    "Portuguese": "pt",
+    "Russian": "ru",
+    "Arabic": "ar",
+    "Korean": "ko",
+    "Italian": "it",
+    "Dutch": "nl",
+    "Turkish": "tr",
+    "Indonesian": "id"
+})
+
 # -------- Speech To Text --------
 def speech_to_text(audio_path):
     """Transcribe audio and attempt to auto-detect the source language.
