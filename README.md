@@ -94,3 +94,9 @@ FINAL EXPECTED BEHAVIOR
 - Returns localized result in structured JSON
 
 - The module must be scalable and API-ready.
+
+-----------------------------------
+## 📸 Preview
+
+![Login Page Preview](image.jpeg)
+-----------------------------------
