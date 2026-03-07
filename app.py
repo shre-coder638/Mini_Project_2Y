@@ -309,5 +309,6 @@ def process_visual():
         return f"Error processing visual: {str(e)}\n\nTraceback:\n{tb}", 500
 
 
+
 if __name__ == "__main__":
     app.run(debug=True)
