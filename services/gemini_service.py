@@ -11,7 +11,7 @@ except Exception:
 
 load_dotenv()
 
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+genai.configure(api_key=(os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or os.getenv('API_KEY') or os.getenv('OPENAI_API_KEY')))
 
 model = genai.GenerativeModel("gemini-flash-latest")
 

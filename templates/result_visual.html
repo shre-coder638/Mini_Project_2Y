@@ -11,6 +11,13 @@
         <p><strong>Language:</strong> {{ target_language }}</p>
         <p><strong>Region:</strong> {{ target_region }}</p>
         <p><strong>Tone:</strong> {{ tone }}</p>
+        {% if filename %}
+        <p><strong>Uploaded File:</strong> {{ filename }}</p>
+        {% endif %}
+        {% if image_url %}
+        <p><strong>Preview:</strong></p>
+        <img src="{{ image_url }}" alt="Uploaded image" style="max-width:100%; border:1px solid #ddd; padding:6px; margin-top:6px;" />
+        {% endif %}
     </div>
 
     <div class="box">
@@ -20,8 +27,34 @@
 
     <div class="box output">
         <h3>Localized Visual Text</h3>
-        <p>{{ localized_output }}</p>
+        {% if error_message %}
+            <p style="color:crimson"><strong>Error:</strong> {{ error_message }}</p>
+        {% else %}
+            <p>{{ localized_output }}</p>
+        {% endif %}
     </div>
+
+    {% if cultural_notes and cultural_notes|length > 0 %}
+    <div class="box">
+        <h3>Cultural Notes</h3>
+        <ul>
+            {% for n in cultural_notes %}
+            <li>{{ n }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if warnings and warnings|length > 0 %}
+    <div class="box">
+        <h3>Warnings</h3>
+        <ul>
+            {% for w in warnings %}
+            <li style="color:darkorange">{{ w }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 
     <div class="actions">
         <a href="/visual"><button>🔄 Try Again</button></a>

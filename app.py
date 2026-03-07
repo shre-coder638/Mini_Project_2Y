@@ -3,6 +3,24 @@ from services.voice_service import speech_to_text, text_to_speech
 from langdetect import detect, LangDetectException
 import os
 from services.gemini_service import localize_text
+from services.visual_service import get_visual_localization_service
+from services.utils import validate_file, get_config
+from werkzeug.utils import secure_filename
+import time
+import uuid
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    pass
+
+# If a single API key is provided in .env (e.g., GOOGLE_API_KEY), prefer it
+_env_key = os.getenv('GOOGLE_API_KEY') or os.getenv('API_KEY')
+if _env_key:
+    os.environ.setdefault('OPENAI_API_KEY', _env_key)
+    os.environ.setdefault('GOOGLE_API_KEY', _env_key)
+    os.environ.setdefault('GEMINI_API_KEY', _env_key)
+    os.environ.setdefault('API_KEY', _env_key)
 
 
 app = Flask(__name__)
@@ -190,17 +208,105 @@ def process_visual():
     target_language = request.form.get("target_language")
     target_region = request.form.get("target_region")
     tone = request.form.get("tone")
+    ocr_language = request.form.get("ocr_language") or 'en'
 
-    filename = image.filename if image else "No image uploaded"
+    if not image:
+        return redirect(url_for("visual_localization"))
 
-    return f"""
-    <h2>Visual Input Received:</h2>
-    <p><strong>Image:</strong> {filename}</p>
-    <p><strong>Caption:</strong> {caption}</p>
-    <p><strong>Language:</strong> {target_language}</p>
-    <p><strong>Region:</strong> {target_region}</p>
-    <p><strong>Tone:</strong> {tone}</p>
-    """
+    # Validate uploaded file (size + extension)
+    is_valid, err = validate_file(image)
+    if not is_valid:
+        return render_template(
+            'result_visual.html',
+            target_language=target_language,
+            target_region=target_region,
+            tone=tone,
+            extracted_text='',
+            localized_output='',
+            error_message=err,
+            filename=getattr(image, 'filename', 'uploaded'),
+            image_url=None,
+            cultural_notes=[],
+            warnings=[]
+        )
+
+    # Ensure required parameters
+    if not target_language or not target_region or not tone:
+        return render_template(
+            'result_visual.html',
+            target_language=target_language,
+            target_region=target_region,
+            tone=tone,
+            extracted_text='',
+            localized_output='',
+            error_message='Missing required parameters: target language, region, or tone',
+            filename=getattr(image, 'filename', 'uploaded'),
+            image_url=None,
+            cultural_notes=[],
+            warnings=[]
+        )
+
+    try:
+        filename = getattr(image, 'filename', 'uploaded')
+
+        # Save uploaded image to static/uploads for preview on results page
+        uploads_dir = os.path.join(app.static_folder, 'uploads')
+        os.makedirs(uploads_dir, exist_ok=True)
+
+        safe_name = secure_filename(filename)
+        unique = f"{int(time.time())}-{uuid.uuid4().hex[:8]}-" + safe_name
+        save_path = os.path.join(uploads_dir, unique)
+
+        # Save a copy for preview, then pass the saved path to the service
+        image.save(save_path)
+        image_url = url_for('static', filename=f'uploads/{unique}')
+
+        svc = get_visual_localization_service()
+
+        result = svc.process_image(
+            image_file=save_path,
+            target_language=target_language,
+            target_region=target_region,
+            tone=tone,
+            user_caption=caption,
+            ocr_language=ocr_language
+        )
+        
+        print("VISUAL RESULT:", result)
+
+        if not result.get('success'):
+            error_msg = result.get('error', 'Unknown error during visual processing')
+            return render_template(
+                'result_visual.html',
+                target_language=target_language,
+                target_region=target_region,
+                tone=tone,
+                extracted_text=result.get('ocr_text') or "No text detected",
+                localized_output=result.get('localized_caption') or result.get('localized_text', ''),
+                error_message=error_msg,
+                filename=filename,
+                image_url=image_url,
+                cultural_notes=result.get('cultural_notes', []),
+                warnings=result.get('warnings', [])
+            )
+
+        return render_template(
+            'result_visual.html',
+            target_language=target_language,
+            target_region=target_region,
+            tone=tone,
+            extracted_text=result.get('ocr_text') or "No text detected",
+            localized_output=result.get('localized_caption') or result.get('localized_text', ''),
+            filename=filename,
+            image_url=image_url,
+            cultural_notes=result.get('cultural_notes', []),
+            warnings=result.get('warnings', [])
+        )
+
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        return f"Error processing visual: {str(e)}\n\nTraceback:\n{tb}", 500
 
 
 if __name__ == "__main__":
