@@ -9,6 +9,8 @@
     {% set current_section = '' %}
     {% if request.endpoint == 'home' %}
         {% set current_section = 'home' %}
+    {% elif request.endpoint == 'feedback' %}
+        {% set current_section = 'feedback' %}
     {% elif request.endpoint in ['text_localization', 'generate'] %}
         {% set current_section = 'text' %}
     {% elif request.endpoint in ['voice_localization', 'process_voice'] %}
@@ -34,6 +36,9 @@
             {% endif %}
             {% if current_section != 'visual' %}
                 <li><a href="/visual">Visual</a></li>
+            {% endif %}
+            {% if current_section != 'feedback' %}
+                <li><a href="/feedback">Feedback</a></li>
             {% endif %}
         </ul>
     </nav>

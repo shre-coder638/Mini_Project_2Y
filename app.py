@@ -308,6 +308,62 @@ def process_visual():
         tb = traceback.format_exc()
         return f"Error processing visual: {str(e)}\n\nTraceback:\n{tb}", 500
 
+from flask_sqlalchemy import SQLAlchemy
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///feedback.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# Ensure the feedback table exists when the app starts
+try:
+    with app.app_context():
+        db.create_all()
+except Exception:
+    # If DB can't be created at import time, it will be created on first request
+    pass
+
+class Feedback(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    email = db.Column(db.String(120))
+    rating = db.Column(db.Integer)
+    comments = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    def __repr__(self):
+        return f"<Feedback {self.name}>"
+
+
+@app.route("/feedback", methods=["GET", "POST"])
+def feedback():
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        rating = request.form.get("rating")
+        try:
+            rating = int(rating) if rating else None
+        except Exception:
+            rating = None
+        comments = request.form.get("comments")
+
+        fb = Feedback(
+            name=name,
+            email=email,
+            rating=rating,
+            comments=comments
+        )
+
+        try:
+            db.session.add(fb)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return f"Error saving feedback: {e}", 500
+
+        return render_template("thank_you.html")
+
+    return render_template("feedback.html")
 
 
 if __name__ == "__main__":
