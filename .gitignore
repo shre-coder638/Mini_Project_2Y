@@ -1,16 +1,86 @@
-# Virtual environment
-venv/
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
-*.bat
+*.py[cod]
+*$py.class
 
-# Environment variables
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-wheel-metadata/
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+venv.bak/
+venv*/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Type checkers
+.pyre/
+.mypy_cache/
+
+# Flask instance folder
+instance/
+
+# Uploaded files and user data
+uploads/
+static/uploads/
+
+# dotenv
 .env
+.env.*
 
-# Audio outputs
-static/output_voice.mp3
-temp_audio.wav
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
 
 # OS files
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+
+# Databases
+*.sqlite3
+*.db
