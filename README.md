@@ -9,7 +9,7 @@ The **Visual Localization Module** is a component of the **Automated Content Loc
 -----------------------------------
 Repository structure
 -----------------------------------
-
+                                                                                
 - `app.py` - Flask application entrypoint that serves the web UI.
 - `services/` - helper modules for voice and Gemini-related operations (`gemini_service.py`, `voice_service.py`).
 - `templates/` - Jinja2 HTML templates for pages and results.
