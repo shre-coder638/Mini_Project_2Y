@@ -1,4 +1,6 @@
-# Mini Project (AIML) 2025-2026 (Automated Content Localization)
+# Mini Project (AIML) 2025-2026 
+ 
+## Project Title : Automated Content Localization
 
 -----------------------------------
 Project overview
