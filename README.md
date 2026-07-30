@@ -1,4 +1,4 @@
-# Mini Project (AIML) 2025-2026
+# Mini Project (AIML) 2025-2026 
 
 -----------------------------------
 Project overview
