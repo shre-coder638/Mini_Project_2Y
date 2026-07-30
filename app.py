@@ -50,7 +50,7 @@ def process():
 
 @app.route("/text")
 def text_localization():
-    return render_template("text.html")
+    return render_template("text.html")    # call text.html file
 
 
 @app.route("/generate", methods=["POST"])
